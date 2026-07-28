@@ -5,7 +5,7 @@ variable "config" {
     location                        = string
     size                            = string
     admin_username                  = string
-    admin_ssh_key                   = optional(string)
+    admin_password                  = string
     disable_password_authentication = optional(bool, true)
     network_interface_ids           = list(string)
     tags                            = optional(map(string), {})

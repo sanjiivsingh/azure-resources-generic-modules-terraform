@@ -1,0 +1,138 @@
+name: Terraform Continuous Integration
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  id-token: write      # Required for GitHub OIDC authentication
+  contents: read       # Required to checkout repository contents
+  security-events: write # Required if uploading SARIF security reports
+
+jobs:
+  terraform-validation:
+    name: Validate Terraform Infrastructure
+    runs-on: ubuntu-latest
+
+    steps:
+
+      #####################################################################
+      # Step 1 - Download the repository source code
+      #####################################################################
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      #####################################################################
+      # Step 2 - Install Terraform CLI
+      #####################################################################
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      #####################################################################
+      # Step 3 - Authenticate to Azure using GitHub OIDC
+      #
+      # No client secret is required.
+      # GitHub requests a temporary JWT token from its OIDC provider.
+      # Azure validates that token against the configured
+      # Federated Credential and issues a temporary Azure access token.
+      #####################################################################
+      - name: Authenticate to Azure using OIDC
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      #####################################################################
+      # Step 4 - Verify Azure Authentication
+      #
+      # Optional but useful while developing the pipeline.
+      #####################################################################
+      - name: Verify Azure Login
+        run: |
+          az account show
+
+      #####################################################################
+      # Step 5 - Check Terraform Formatting
+      #
+      # Ensures all Terraform files follow standard formatting.
+      #####################################################################
+      - name: Check Terraform Formatting
+        run: terraform fmt -check -recursive
+
+      #####################################################################
+      # Step 6 - Initialize Terraform
+      #
+      # Downloads providers and configures the remote backend.
+      #####################################################################
+      - name: Initialize Terraform
+        working-directory: environments/dev
+        run: terraform init
+
+      #####################################################################
+      # Step 7 - Validate Terraform Configuration
+      #
+      # Detects syntax errors and invalid Terraform configuration.
+      #####################################################################
+      - name: Validate Terraform Configuration
+        working-directory: environments/dev
+        run: terraform validate
+
+      #####################################################################
+      # Step 8 - Install TFLint
+      #####################################################################
+      - name: Install TFLint
+        uses: terraform-linters/setup-tflint@v4
+
+      #####################################################################
+      # Step 9 - Initialize TFLint Plugins
+      #####################################################################
+      - name: Initialize TFLint Rules
+        run: tflint --init
+
+      #####################################################################
+      # Step 10 - Run Terraform Linting
+      #
+      # Detects deprecated arguments, Azure provider issues,
+      # unused variables, and Terraform best practice violations.
+      #####################################################################
+      - name: Run TFLint
+        run: tflint
+
+      #####################################################################
+      # Step 11 - Scan Repository for Secrets
+      #
+      # Detects passwords, API keys, SSH keys,
+      # Azure Storage Keys, SAS Tokens, etc.
+      #####################################################################
+      - name: Scan Repository for Secrets
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      #####################################################################
+      # Step 12 - Scan Terraform for Security Issues
+      #
+      # Examples:
+      # - Public Storage Accounts
+      # - Open NSG Rules
+      # - Missing Key Vault Protection
+      # - Missing Managed Identity
+      #####################################################################
+    #   - name: Run Checkov Security Scan
+    #     uses: bridgecrewio/checkov-action@master
+    #     with:
+    #       directory: .
+    #       framework: terraform
+
+      #####################################################################
+      # Step 13 - Generate Terraform Execution Plan
+      #
+      # Shows the infrastructure changes without applying them.
+      #####################################################################
+      - name: Generate Terraform Plan
+        working-directory: environments/dev
+        run: terraform plan -no-color
