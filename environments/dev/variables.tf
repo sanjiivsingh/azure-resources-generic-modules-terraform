@@ -101,10 +101,10 @@ variable "bastion_hosts" {
 
 variable "linux_vms" {
   type = map(object({
-    name_suffix    = string
-    rg_key         = string
-    nic_key        = string
-    size           = string
+    name_suffix = string
+    rg_key      = string
+    nic_key     = string
+    size        = string
     os_disk = object({
       caching              = string
       storage_account_type = string

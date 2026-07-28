@@ -166,10 +166,10 @@ bastion_hosts = {
 # 9 Linux Virtual Machines (Frontend VM & Backend VM)
 linux_vms = {
   "frontend_vm" = {
-    name_suffix    = "fe-01"
-    rg_key         = "main"
-    nic_key        = "frontend_nic"
-    size           = "Standard_D2s_v3"
+    name_suffix = "fe-01"
+    rg_key      = "main"
+    nic_key     = "frontend_nic"
+    size        = "Standard_D2s_v3"
     os_disk = {
       caching              = "ReadWrite"
       storage_account_type = "Standard_LRS"
@@ -182,10 +182,10 @@ linux_vms = {
     }
   }
   "backend_vm" = {
-    name_suffix    = "be-01"
-    rg_key         = "main"
-    nic_key        = "backend_nic"
-    size           = "Standard_D2s_v3"
+    name_suffix = "be-01"
+    rg_key      = "main"
+    nic_key     = "backend_nic"
+    size        = "Standard_D2s_v3"
     os_disk = {
       caching              = "ReadWrite"
       storage_account_type = "Standard_LRS"
