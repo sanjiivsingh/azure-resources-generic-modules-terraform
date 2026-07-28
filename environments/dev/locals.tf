@@ -108,9 +108,9 @@ locals {
       resource_group_name             = module.resource_group[v.rg_key].resource_group.name
       location                        = var.location
       size                            = v.size
-      admin_username                  = v.admin_username
-      admin_ssh_key                   = file("~/.ssh/azure_vm_test_key.pub")
-      disable_password_authentication = true
+      admin_username                  = data.azurerm_key_vault_secret.vm_username.value
+      admin_password                  = data.azurerm_key_vault_secret.vm_password.value
+      disable_password_authentication = false
       network_interface_ids           = [module.network_interface[v.nic_key].network_interface.id]
       tags                            = local.common_tags
       os_disk                         = v.os_disk

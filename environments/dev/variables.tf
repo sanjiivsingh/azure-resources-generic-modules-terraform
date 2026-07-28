@@ -105,8 +105,6 @@ variable "linux_vms" {
     rg_key         = string
     nic_key        = string
     size           = string
-    admin_username = string
-    admin_ssh_key  = optional(string)
     os_disk = object({
       caching              = string
       storage_account_type = string
