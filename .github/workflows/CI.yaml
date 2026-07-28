@@ -69,6 +69,7 @@ jobs:
       # Downloads providers and configures the remote backend.
       #####################################################################
       - name: Initialize Terraform
+        working-directory: environments/dev
         run: terraform init
 
       #####################################################################
@@ -77,6 +78,7 @@ jobs:
       # Detects syntax errors and invalid Terraform configuration.
       #####################################################################
       - name: Validate Terraform Configuration
+        working-directory: environments/dev
         run: terraform validate
 
       #####################################################################
@@ -132,4 +134,5 @@ jobs:
       # Shows the infrastructure changes without applying them.
       #####################################################################
       - name: Generate Terraform Plan
+        working-directory: environments/dev
         run: terraform plan -no-color
