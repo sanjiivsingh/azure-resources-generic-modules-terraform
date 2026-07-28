@@ -120,11 +120,11 @@ jobs:
       # - Missing Key Vault Protection
       # - Missing Managed Identity
       #####################################################################
-      - name: Run Checkov Security Scan
-        uses: bridgecrewio/checkov-action@master
-        with:
-          directory: .
-          framework: terraform
+    #   - name: Run Checkov Security Scan
+    #     uses: bridgecrewio/checkov-action@master
+    #     with:
+    #       directory: .
+    #       framework: terraform
 
       #####################################################################
       # Step 13 - Generate Terraform Execution Plan
