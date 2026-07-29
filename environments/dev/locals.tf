@@ -6,10 +6,18 @@ locals {
     Environment = var.environment
   }, var.tags)
 
+  # Name prefix for child module resources
+  name_prefix="${var.project_name}-${var.environment}"
+
+  # name_prefix = join("-", [
+  #   var.project_name,
+  #   var.environment
+  # ])
+
   # Resource Group objects for child module
   resource_groups = {
     for k, v in var.resource_groups : k => {
-      name     = "rg-${var.project_name}-${var.environment}-${v.name_suffix}"
+      name     = "rg-${local.name_prefix}-${v.name_suffix}"
       location = var.location
       tags     = local.common_tags
     }
@@ -18,7 +26,7 @@ locals {
   # Virtual Network objects for child module
   virtual_networks = {
     for k, v in var.virtual_networks : k => {
-      name                = "vnet-${var.project_name}-${var.environment}-${v.name_suffix}"
+      name                = "vnet-${local.name_prefix}-${v.name_suffix}"
       location            = var.location
       resource_group_name = module.resource_group[v.rg_key].resource_group.name
       address_space       = v.address_space
@@ -39,7 +47,7 @@ locals {
   # Public IP objects for child module
   public_ips = {
     for k, v in var.public_ips : k => {
-      name                = "pip-${var.project_name}-${var.environment}-${v.name_suffix}"
+      name                = "pip-${local.name_prefix}-${v.name_suffix}"
       resource_group_name = module.resource_group[v.rg_key].resource_group.name
       location            = var.location
       allocation_method   = v.allocation_method
@@ -51,7 +59,7 @@ locals {
   # NSG objects for child module
   nsgs = {
     for k, v in var.nsgs : k => {
-      name                = "nsg-${var.project_name}-${var.environment}-${v.name_suffix}"
+      name                = "nsg-${local.name_prefix}-${v.name_suffix}"
       location            = var.location
       resource_group_name = module.resource_group[v.rg_key].resource_group.name
       security_rule       = v.security_rules
@@ -70,7 +78,7 @@ locals {
   # Network Interface objects for child module
   network_interfaces = {
     for k, v in var.network_interfaces : k => {
-      name                = "nic-${var.project_name}-${var.environment}-${v.name_suffix}"
+      name                = "nic-${local.name_prefix}-${v.name_suffix}"
       location            = var.location
       resource_group_name = module.resource_group[v.rg_key].resource_group.name
       tags                = local.common_tags
@@ -88,7 +96,7 @@ locals {
   # Bastion Host objects for child module
   bastion_hosts = {
     for k, v in var.bastion_hosts : k => {
-      name                = "bas-${var.project_name}-${var.environment}-${v.name_suffix}"
+      name                = "bas-${local.name_prefix}-${v.name_suffix}"
       location            = var.location
       resource_group_name = module.resource_group[v.rg_key].resource_group.name
       sku                 = v.sku
@@ -104,7 +112,7 @@ locals {
   # Linux Virtual Machine objects for child module
   linux_vms = {
     for k, v in var.linux_vms : k => {
-      name                            = "vm-${var.project_name}-${var.environment}-${v.name_suffix}"
+      name                            = "vm-${local.name_prefix}-${v.name_suffix}"
       resource_group_name             = module.resource_group[v.rg_key].resource_group.name
       location                        = var.location
       size                            = v.size
@@ -121,7 +129,7 @@ locals {
   # Application Gateway objects for child module
   application_gateways = {
     for k, v in var.application_gateways : k => {
-      name                = "agw-${var.project_name}-${var.environment}-${v.name_suffix}"
+      name                = "agw-${local.name_prefix}-${v.name_suffix}"
       location            = var.location
       resource_group_name = module.resource_group[v.rg_key].resource_group.name
       sku                 = v.sku
@@ -165,7 +173,7 @@ locals {
   # Key Vault objects for child module
   key_vaults = {
     for k, v in var.key_vaults : k => {
-      name                        = "kv-${var.project_name}-${var.environment}-${v.name_suffix}"
+      name                        = "kv-${local.name_prefix}-${v.name_suffix}"
       location                    = var.location
       resource_group_name         = module.resource_group[v.rg_key].resource_group.name
       rbac_authorization_enabled  = v.rbac_authorization_enabled
