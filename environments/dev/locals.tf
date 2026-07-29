@@ -7,7 +7,7 @@ locals {
   }, var.tags)
 
   # Name prefix for child module resources
-  name_prefix="${var.project_name}-${var.environment}"
+  name_prefix = "${var.project_name}-${var.environment}"
 
   # name_prefix = join("-", [
   #   var.project_name,
