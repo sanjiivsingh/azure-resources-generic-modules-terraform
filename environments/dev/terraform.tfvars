@@ -183,7 +183,7 @@ virtual_machines = {
       version   = "latest"
     }
     authentication = {
-      type = "ssh"
+      type = "entra"
       # Authentication type must be ssh, password or entra."
     }
     extensions = {
