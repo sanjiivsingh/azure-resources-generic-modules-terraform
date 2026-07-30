@@ -167,9 +167,9 @@ bastion_hosts = {
 virtual_machines = {
   "frontendvm" = {
     name_suffix = "fe"
-    rg_key="main"
-    nic_key="frontend_nic"
-    size = "Standard_D2s_v3"
+    rg_key      = "main"
+    nic_key     = "frontend_nic"
+    size        = "Standard_D2s_v3"
 
     os_disk = {
       caching              = "ReadWrite"
@@ -196,11 +196,11 @@ virtual_machines = {
       }
     }
   }
-   "backendvm" = {
+  "backendvm" = {
     name_suffix = "be"
-    rg_key="main"
-    nic_key="backend_nic"
-    size = "Standard_D2s_v3"
+    rg_key      = "main"
+    nic_key     = "backend_nic"
+    size        = "Standard_D2s_v3"
 
     os_disk = {
       caching              = "ReadWrite"

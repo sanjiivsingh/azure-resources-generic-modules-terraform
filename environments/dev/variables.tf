@@ -102,9 +102,9 @@ variable "bastion_hosts" {
 variable "virtual_machines" {
   type = map(object({
     name_suffix = string
-    rg_key=string
-    nic_key=string
-    size = string
+    rg_key      = string
+    nic_key     = string
+    size        = string
 
     os_disk = object({
       caching              = string
