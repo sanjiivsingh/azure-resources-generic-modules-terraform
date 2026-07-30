@@ -110,19 +110,33 @@ locals {
   }
 
   # Linux Virtual Machine objects for child module
-  linux_vms = {
-    for k, v in var.linux_vms : k => {
-      name                            = "vm-${local.name_prefix}-${v.name_suffix}"
-      resource_group_name             = module.resource_group[v.rg_key].resource_group.name
-      location                        = var.location
-      size                            = v.size
-      admin_username                  = data.azurerm_key_vault_secret.vm_username.value
-      admin_password                  = data.azurerm_key_vault_secret.vm_password.value
-      disable_password_authentication = false
-      network_interface_ids           = [module.network_interface[v.nic_key].network_interface.id]
-      tags                            = local.common_tags
-      os_disk                         = v.os_disk
-      source_image_reference          = v.source_image_reference
+  virtual_machines = {
+    for k, v in var.virtual_machines : k =>
+    {
+      name                   = "vm-${local.name_prefix}-${v.name_suffix}"
+      resource_group_name    = module.resource_group[v.rg_key].resource_group.name
+      location               = var.location
+      size                   = v.size
+      network_interface_ids  = [module.network_interface[v.nic_key].network_interface.id, ]
+      os_disk                = v.os_disk
+      source_image_reference = v.source_image_reference
+      authentication = {
+        type             = v.authentication.type
+        admin_username   = data.azurerm_key_vault_secret.username.value
+        admin_password   = data.azurerm_key_vault_secret.password.value
+        admin_public_key = data.azurerm_key_vault_secret.public_key.value
+      }
+
+      extensions = v.authentication.type == "entra" ? {
+        for key, value in v.extensions : key =>
+        {
+          publisher                  = value.publisher
+          type                       = value.type
+          type_handler_version       = value.type_handler_version
+          auto_upgrade_minor_version = value.auto_upgrade_minor_version
+        }
+
+      } : {}
     }
   }
 

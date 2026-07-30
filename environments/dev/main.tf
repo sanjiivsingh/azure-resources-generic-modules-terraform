@@ -47,9 +47,9 @@ module "bastion_host" {
 }
 
 module "linux_virtual_machine" {
-  for_each = var.linux_vms
+  for_each = var.virtual_machines
   source   = "../../modules/azurerm_linux_virtual_machine"
-  config   = local.linux_vms[each.key]
+  config   = local.virtual_machines[each.key]
 }
 
 module "application_gateway" {
