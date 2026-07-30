@@ -164,42 +164,81 @@ bastion_hosts = {
 }
 
 # 9 Linux Virtual Machines (Frontend VM & Backend VM)
-linux_vms = {
-  "frontend_vm" = {
-    name_suffix = "fe-01"
+virtual_machines = {
+  "frontendvm" = {
+    name_suffix = "fe"
     rg_key      = "main"
     nic_key     = "frontend_nic"
     size        = "Standard_D2s_v3"
+
     os_disk = {
       caching              = "ReadWrite"
       storage_account_type = "Standard_LRS"
     }
+
     source_image_reference = {
       publisher = "Canonical"
       offer     = "0001-com-ubuntu-server-jammy"
       sku       = "22_04-lts"
       version   = "latest"
     }
+    authentication = {
+      type = "entra"
+      # Authentication type must be ssh, password or entra."
+    }
+    extensions = {
+      aad_login = {
+        publisher                  = "Microsoft.Azure.ActiveDirectory"
+        type                       = "AADSSHLoginForLinux"
+        type_handler_version       = "1.0"
+        auto_upgrade_minor_version = true
+
+      }
+    }
   }
-  "backend_vm" = {
-    name_suffix = "be-01"
+  "backendvm" = {
+    name_suffix = "be"
     rg_key      = "main"
     nic_key     = "backend_nic"
     size        = "Standard_D2s_v3"
+
     os_disk = {
       caching              = "ReadWrite"
       storage_account_type = "Standard_LRS"
     }
+
     source_image_reference = {
       publisher = "Canonical"
       offer     = "0001-com-ubuntu-server-jammy"
       sku       = "22_04-lts"
       version   = "latest"
     }
+    authentication = {
+      type = "entra"
+      # Authentication type must be ssh, password or entra."
+    }
+    extensions = {
+      aad_login = {
+        publisher                  = "Microsoft.Azure.ActiveDirectory"
+        type                       = "AADSSHLoginForLinux"
+        type_handler_version       = "1.0"
+        auto_upgrade_minor_version = true
+
+      }
+    }
   }
 }
+# 10 Fetching existing key vault details
+key_vault = {
+  name                = "mykeyvalult0"
+  resource_group_name = "rg-dev"
+  username            = "vm-username"
+  password            = "vm-password"
+  public_key          = "vm-public-key"
+}
 
-# 10 Application Gateway (Domain-based routing for front.b18g4.online & back.b18g4.online)
+
+# 11 Application Gateway (Domain-based routing for front.b18g4.online & back.b18g4.online)
 application_gateways = {
   "main_appgw" = {
     name_suffix = "01"
@@ -277,7 +316,7 @@ application_gateways = {
   }
 }
 
-# 11 Key Vaults
+# 12 Key Vaults
 key_vaults = {
   "main_kv" = {
     name_suffix                 = "01"

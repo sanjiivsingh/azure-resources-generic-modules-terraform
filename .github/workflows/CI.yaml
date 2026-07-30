@@ -133,6 +133,6 @@ jobs:
       #
       # Shows the infrastructure changes without applying them.
       #####################################################################
-      - name: Generate Terraform Plan
-        working-directory: environments/dev
-        run: terraform plan -no-color
+      # - name: Generate Terraform Plan
+      #   working-directory: environments/dev
+      #   run: terraform plan -no-color
