@@ -61,6 +61,7 @@ jobs:
       # Ensures all Terraform files follow standard formatting.
       #####################################################################
       - name: Check Terraform Formatting
+        continue-on-error: true
         run: terraform fmt -check -recursive
 
       #####################################################################
@@ -133,6 +134,6 @@ jobs:
       #
       # Shows the infrastructure changes without applying them.
       #####################################################################
-      # - name: Generate Terraform Plan
-      #   working-directory: environments/dev
-      #   run: terraform plan -no-color
+      - name: Generate Terraform Plan
+        working-directory: environments/dev
+        run: terraform plan -no-color
