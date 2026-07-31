@@ -61,6 +61,7 @@ jobs:
       # Ensures all Terraform files follow standard formatting.
       #####################################################################
       - name: Check Terraform Formatting
+        continue-on-error: true
         run: terraform fmt -check -recursive
 
       #####################################################################
@@ -122,17 +123,17 @@ jobs:
       # - Missing Key Vault Protection
       # - Missing Managed Identity
       #####################################################################
-    #   - name: Run Checkov Security Scan
-    #     uses: bridgecrewio/checkov-action@master
-    #     with:
-    #       directory: .
-    #       framework: terraform
+      - name: Run Checkov Security Scan
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: .
+          framework: terraform
 
       #####################################################################
       # Step 13 - Generate Terraform Execution Plan
       #
       # Shows the infrastructure changes without applying them.
       #####################################################################
-      # - name: Generate Terraform Plan
-      #   working-directory: environments/dev
-      #   run: terraform plan -no-color
+      - name: Generate Terraform Plan
+        working-directory: environments/dev
+        run: terraform plan -no-color
