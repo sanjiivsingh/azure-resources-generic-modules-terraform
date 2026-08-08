@@ -60,7 +60,7 @@ jobs:
       runs-on: ubuntu-latest
       defaults:
         run:
-            working-directory: environment/dev
+            working-directory: environments/dev
 
       steps:
 
@@ -98,7 +98,7 @@ jobs:
       runs-on: ubuntu-latest
       defaults:
         run:
-            working-directory: environment/dev
+            working-directory: environments/dev
 
       steps:
 
