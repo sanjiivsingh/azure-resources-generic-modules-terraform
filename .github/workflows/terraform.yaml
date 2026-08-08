@@ -1,0 +1,135 @@
+name: Terraform CI & CD
+
+on:
+  pull_request:
+    branches:
+    - main
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read   
+
+jobs:
+
+  scan:
+    if: github.event_name == 'pull_request'
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+        - name: Checkout Repo
+          uses: actions/checkout@v7  
+          with:
+            fetch-depth: 0
+
+        - name: Gitleaks Scanning
+          uses: gitleaks/gitleaks-action@v3
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
+
+        - name: TruffleHog OSS
+          uses: trufflesecurity/trufflehog@v3.96.0
+          with:
+            extra_args: --results=verified,unknown
+
+        - uses: terraform-linters/setup-tflint@v6
+          name: Setup TFLint
+          with:
+            tflint_version: v0.52.0
+            cache: true
+
+        - name: Show version
+          run: tflint --version
+
+        - name: Init TFLint
+          run: tflint --init
+          env:
+            GITHUB_TOKEN: ${{ github.token }}
+
+        - name: Run TFLint
+          run: tflint -f compact  
+
+
+  plan:
+      if: github.event_name == 'pull_request'
+      name: Terraform Plan
+      needs: scan
+      runs-on: ubuntu-latest
+      defaults:
+        run:
+            working-directory: environment/dev
+
+      steps:
+
+        - name: Checkout Repo
+          uses: actions/checkout@v7
+        
+        - name: Azure login
+          uses: azure/login@v3
+          with:
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+        - uses: hashicorp/setup-terraform@v4
+          with:
+            terraform_version: "1.14.6"
+
+        - name: Terraform fmt
+          run: terraform fmt -check
+          continue-on-error: true
+
+        - name: Terraform Init
+          run: terraform init
+
+        - name: Terraform Validate
+          run: terraform validate
+
+        - name: Terraform Plan
+          run: terraform plan
+          
+
+  apply:
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      name: Terraform Apply
+      runs-on: ubuntu-latest
+      defaults:
+        run:
+            working-directory: environment/dev
+
+      steps:
+
+        - name: Checkout Repo
+          uses: actions/checkout@v7
+        
+        - name: Azure login
+          uses: azure/login@v3
+          with:
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+        - uses: hashicorp/setup-terraform@v4
+          with:
+            terraform_version: "1.14.6"
+
+        - name: Terraform fmt
+          run: terraform fmt -check
+          continue-on-error: true
+
+        - name: Terraform Init
+          run: terraform init
+          
+        - name: Terraform Apply
+          run: terraform apply -auto-approve
+
+
+
+
+
+
+
+
